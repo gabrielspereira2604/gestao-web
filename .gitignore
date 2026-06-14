@@ -6,6 +6,13 @@
 # dotenv files
 .env
 
+# Arquivos enviados por usuários
+GestaoWeb/wwwroot/uploads/*
+!GestaoWeb/wwwroot/uploads/.gitkeep
+
+# Development settings with secrets (connection string, SMTP)
+appsettings.Development.json
+
 # User-specific files
 *.rsuser
 *.suo

@@ -14,7 +14,7 @@
         <div class="uk-margin">
             <label asp-for="AssignedToId" class="uk-form-label"></label>
             <div class="uk-form-controls">
-                <select asp-for="AssignedToId" asp-items="ViewBag.Subordinates" class="uk-select">
+                <select asp-for="AssignedToId" asp-items="ViewBag.Collaborators" class="uk-select">
                     <option value="">— Selecione o responsável —</option>
                 </select>
                 <span asp-validation-for="AssignedToId" class="uk-text-danger uk-text-small"></span>

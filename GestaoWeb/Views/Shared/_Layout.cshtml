@@ -7,76 +7,81 @@
 }
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] — GestaoWeb</title>
+    <title>@ViewData["Title"] - GestaoWeb</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3/dist/css/uikit.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
+
 <body>
 
-<nav class="uk-navbar-container gw-navbar" uk-navbar>
-    <div class="uk-container">
-        <div class="uk-navbar-left">
-            <a class="uk-navbar-item uk-logo" asp-controller="Home" asp-action="Index">GestaoWeb</a>
+    <nav class="uk-navbar-container gw-navbar" uk-navbar>
+        <div class="uk-container">
+            <div class="uk-navbar-left">
+                <a class="uk-navbar-item uk-logo" asp-controller="Home" asp-action="Index">GestaoWeb</a>
+                @if (currentUser != null)
+                {
+                    <ul class="uk-navbar-nav">
+                        <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "uk-active" : "")">
+                            <a asp-controller="Home" asp-action="Index">Início</a>
+                        </li>
+                        @if (isManager)
+                        {
+                            <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Users" ? "uk-active" : "")">
+                                <a asp-controller="Users" asp-action="Index">Usuários</a>
+                            </li>
+                        }
+                        <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Tasks" ? "uk-active" : "")">
+                            <a asp-controller="Tasks" asp-action="Index">Tarefas</a>
+                        </li>
+                    </ul>
+                }
+            </div>
+
             @if (currentUser != null)
             {
-                <ul class="uk-navbar-nav">
-                    <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "uk-active" : "")">
-                        <a asp-controller="Home" asp-action="Index">Início</a>
-                    </li>
-                    @if (isManager)
-                    {
-                        <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Users" ? "uk-active" : "")">
-                            <a asp-controller="Users" asp-action="Index">Usuários</a>
-                        </li>
-                    }
-                    <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Tasks" ? "uk-active" : "")">
-                        <a asp-controller="Tasks" asp-action="Index">Tarefas</a>
-                    </li>
-                </ul>
-            }
+                <div class="uk-navbar-right">
+                    <ul class="uk-navbar-nav">
+                        <li>
+                            <a href="#">
+                                @if (!string.IsNullOrEmpty(currentUser.ProfilePhotoPath))
+                                {
+                                    <img src="@currentUser.ProfilePhotoPath" class="gw-avatar-sm uk-border-circle" alt="" />
+                                }
+                                <span class="uk-margin-small-left">@currentUser.FullName</span>
+                                <span uk-icon="icon: triangle-down; ratio: 0.7"></span>
+                            </a>
+                            <div class="uk-navbar-dropdown">
+                                <ul class="uk-nav uk-navbar-dropdown-nav">
+                                    <li><a asp-controller="Users" asp-action="Edit" asp-route-id="@currentUser.Id">Meu
+                                        perfil</a></li>
+                                        <li class="uk-nav-divider"></li>
+                                        <li>
+                                            <form asp-controller="Account" asp-action="Logout" method="post">
+                                                <button type="submit"
+                                                        class="uk-button uk-button-link gw-logout-btn">Sair</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                }
+            </div>
+        </nav>
+
+        <div class="uk-container uk-margin-medium-top uk-margin-large-bottom">
+            @RenderBody()
         </div>
 
-        @if (currentUser != null)
-        {
-            <div class="uk-navbar-right">
-                <ul class="uk-navbar-nav">
-                    <li>
-                        <a href="#">
-                            @if (!string.IsNullOrEmpty(currentUser.ProfilePhotoPath))
-                            {
-                                <img src="@currentUser.ProfilePhotoPath" class="gw-avatar-sm uk-border-circle" alt="" />
-                            }
-                            <span class="uk-margin-small-left">@currentUser.FullName</span>
-                            <span uk-icon="icon: triangle-down; ratio: 0.7"></span>
-                        </a>
-                        <div class="uk-navbar-dropdown">
-                            <ul class="uk-nav uk-navbar-dropdown-nav">
-                                <li><a asp-controller="Users" asp-action="Edit" asp-route-id="@currentUser.Id">Meu perfil</a></li>
-                                <li class="uk-nav-divider"></li>
-                                <li>
-                                    <form asp-controller="Account" asp-action="Logout" method="post">
-                                        <button type="submit" class="uk-button uk-button-link gw-logout-btn">Sair</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        }
-    </div>
-</nav>
+        <script src="https://cdn.jsdelivr.net/npm/uikit@3/dist/js/uikit.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/uikit@3/dist/js/uikit-icons.min.js"></script>
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        @await RenderSectionAsync("Scripts", required: false)
+    </body>
 
-<div class="uk-container uk-margin-medium-top uk-margin-large-bottom">
-    @RenderBody()
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/uikit@3/dist/js/uikit.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/uikit@3/dist/js/uikit-icons.min.js"></script>
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-@await RenderSectionAsync("Scripts", required: false)
-</body>
 </html>

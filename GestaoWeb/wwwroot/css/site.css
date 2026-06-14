@@ -1,6 +1,15 @@
-.gw-navbar {
+.uk-navbar-container.gw-navbar {
     background: #1e2a3a;
     border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.gw-navbar > .uk-container {
+    display: flex;
+    align-items: stretch;
+}
+
+.gw-navbar .uk-navbar-right {
+    margin-left: auto;
 }
 
 .gw-navbar .uk-logo,

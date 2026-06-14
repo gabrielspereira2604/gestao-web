@@ -49,7 +49,7 @@ public class TasksController : Controller
     {
         if (!await IsManagerAsync()) return RedirectToAction("Index", "Home");
 
-        await PopulateSubordinatesAsync();
+        await PopulateCollaboratorsAsync();
         return View();
     }
 
@@ -62,7 +62,7 @@ public class TasksController : Controller
 
         if (!ModelState.IsValid)
         {
-            await PopulateSubordinatesAsync();
+            await PopulateCollaboratorsAsync();
             return View(model);
         }
 
@@ -188,11 +188,11 @@ public class TasksController : Controller
         return user?.IsManager == true;
     }
 
-    private async Task PopulateSubordinatesAsync()
+    private async Task PopulateCollaboratorsAsync()
     {
         var allUsers = await _userRepo.GetAllAsync();
-        var subordinates = allUsers.Where(u => !u.IsManager).ToList();
-        ViewBag.Subordinates = new SelectList(subordinates, "Id", "FullName");
+        var collaborators = allUsers.Where(u => !u.IsManager).ToList();
+        ViewBag.Collaborators = new SelectList(collaborators, "Id", "FullName");
     }
 
     private static SelectList GetAvailableStatuses(WorkTaskStatus current, bool isManager)

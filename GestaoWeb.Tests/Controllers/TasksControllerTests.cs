@@ -64,12 +64,12 @@ public class TasksControllerTests
         IsManager = true
     };
 
-    private static AppUser Subordinate(string? id = null) => new()
+    private static AppUser Collaborator(string? id = null) => new()
     {
         Id = id ?? Guid.NewGuid().ToString(),
         UserName = "sub@test.com",
         Email = "sub@test.com",
-        FullName = "Subordinado",
+        FullName = "Colaborador",
         MobilePhone = "11999990000",
         Address = "Rua",
         BirthDate = new DateOnly(1995, 1, 1),
@@ -79,7 +79,7 @@ public class TasksControllerTests
     [Fact]
     public async Task Create_Get_NonManager_RedirectsToHome()
     {
-        var controller = CreateController(Subordinate());
+        var controller = CreateController(Collaborator());
 
         var result = await controller.Create() as RedirectToActionResult;
 
@@ -93,7 +93,7 @@ public class TasksControllerTests
     {
         var userMock = new Mock<IUserRepository>();
         userMock.Setup(r => r.GetAllAsync())
-                .ReturnsAsync(new List<AppUser> { Subordinate() });
+                .ReturnsAsync(new List<AppUser> { Collaborator() });
 
         var controller = CreateController(Manager(), userMock: userMock);
 
@@ -105,7 +105,7 @@ public class TasksControllerTests
     [Fact]
     public async Task Create_Post_NonManager_RedirectsToHome()
     {
-        var controller = CreateController(Subordinate());
+        var controller = CreateController(Collaborator());
         var model = new CreateTaskViewModel
         {
             Description = "Tarefa",
@@ -120,9 +120,9 @@ public class TasksControllerTests
     }
 
     [Fact]
-    public async Task Edit_Post_NonOwnerSubordinate_RedirectsToIndex()
+    public async Task Edit_Post_NonOwnerCollaborator_RedirectsToIndex()
     {
-        var sub = Subordinate();
+        var sub = Collaborator();
         var otherId = Guid.NewGuid().ToString();
 
         var task = new TaskItem
@@ -134,7 +134,7 @@ public class TasksControllerTests
             AssignedToId = otherId,
             CreatedById = Guid.NewGuid().ToString(),
             CreatedBy = Manager(),
-            AssignedTo = Subordinate(otherId)
+            AssignedTo = Collaborator(otherId)
         };
 
         var taskMock = new Mock<ITaskRepository>();
@@ -151,9 +151,9 @@ public class TasksControllerTests
     }
 
     [Fact]
-    public async Task Edit_Post_ValidSubordinateOwner_UpdatesStatus()
+    public async Task Edit_Post_ValidCollaboratorOwner_UpdatesStatus()
     {
-        var sub = Subordinate();
+        var sub = Collaborator();
         var manager = Manager();
 
         var task = new TaskItem
@@ -182,9 +182,9 @@ public class TasksControllerTests
     }
 
     [Fact]
-    public async Task Edit_Post_SubordinateCannotRegress_ReturnsViewWithError()
+    public async Task Edit_Post_CollaboratorCannotRegress_ReturnsViewWithError()
     {
-        var sub = Subordinate();
+        var sub = Collaborator();
         var manager = Manager();
 
         var task = new TaskItem
