@@ -1,6 +1,6 @@
 namespace GestaoWeb.Models.Domain;
 
-public enum TaskStatus
+public enum WorkTaskStatus
 {
     Pending,
     InProgress,
@@ -12,7 +12,7 @@ public class TaskItem
     public int Id { get; set; }
     public string Description { get; set; } = string.Empty;
     public DateTime DueDate { get; set; }
-    public TaskStatus Status { get; set; } = TaskStatus.Pending;
+    public WorkTaskStatus Status { get; set; } = WorkTaskStatus.Pending;
 
     public string AssignedToId { get; set; } = string.Empty;
     public AppUser AssignedTo { get; set; } = null!;

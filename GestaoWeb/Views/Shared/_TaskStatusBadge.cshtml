@@ -1,0 +1,11 @@
+@model GestaoWeb.Models.Domain.WorkTaskStatus
+@{
+    var (css, label) = Model switch
+    {
+        GestaoWeb.Models.Domain.WorkTaskStatus.Pending    => ("bg-warning text-dark", "Pendente"),
+        GestaoWeb.Models.Domain.WorkTaskStatus.InProgress => ("bg-info text-dark",    "Em andamento"),
+        GestaoWeb.Models.Domain.WorkTaskStatus.Completed  => ("bg-success",           "Concluída"),
+        _ => ("bg-secondary", Model.ToString())
+    };
+}
+<span class="badge @css">@label</span>

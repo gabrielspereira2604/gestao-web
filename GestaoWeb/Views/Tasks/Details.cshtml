@@ -1,0 +1,50 @@
+@model GestaoWeb.Models.Domain.TaskItem
+@{
+    ViewData["Title"] = "Detalhes da tarefa";
+    bool isManager = ViewBag.IsManager == true;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Detalhes da tarefa</h2>
+    <div class="d-flex gap-2">
+        @if (!isManager && Model.Status != GestaoWeb.Models.Domain.WorkTaskStatus.Completed)
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary">Atualizar status</a>
+        }
+        @if (isManager)
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary">Editar</a>
+        }
+        <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
+    </div>
+</div>
+
+<div class="card shadow-sm" style="max-width:540px;">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Status</dt>
+            <dd class="col-sm-8">@Html.Partial("_TaskStatusBadge", Model.Status)</dd>
+
+            <dt class="col-sm-4">Descrição</dt>
+            <dd class="col-sm-8">@Model.Description</dd>
+
+            <dt class="col-sm-4">Responsável</dt>
+            <dd class="col-sm-8">@Model.AssignedTo.FullName</dd>
+
+            <dt class="col-sm-4">Criada por</dt>
+            <dd class="col-sm-8">@Model.CreatedBy.FullName</dd>
+
+            <dt class="col-sm-4">Data limite</dt>
+            <dd class="col-sm-8">@Model.DueDate.ToString("dd/MM/yyyy HH:mm")</dd>
+
+            <dt class="col-sm-4">Criada em</dt>
+            <dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd>
+
+            @if (Model.CompletedAt.HasValue)
+            {
+                <dt class="col-sm-4">Concluída em</dt>
+                <dd class="col-sm-8">@Model.CompletedAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd>
+            }
+        </dl>
+    </div>
+</div>

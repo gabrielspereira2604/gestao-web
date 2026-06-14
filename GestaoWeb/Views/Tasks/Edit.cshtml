@@ -1,0 +1,45 @@
+@model GestaoWeb.Models.ViewModels.Tasks.EditTaskStatusViewModel
+@{
+    ViewData["Title"] = "Atualizar tarefa";
+    bool isManager = ViewBag.IsManager == true;
+}
+
+<h2 class="mb-4">@(isManager ? "Editar tarefa" : "Atualizar status")</h2>
+
+<div class="card shadow-sm" style="max-width:520px;">
+    <div class="card-body">
+        <dl class="row mb-3">
+            <dt class="col-sm-4">Descrição</dt>
+            <dd class="col-sm-8">@Model.Description</dd>
+
+            <dt class="col-sm-4">Responsável</dt>
+            <dd class="col-sm-8">@Model.AssignedToName</dd>
+
+            <dt class="col-sm-4">Criada por</dt>
+            <dd class="col-sm-8">@Model.CreatedByName</dd>
+
+            <dt class="col-sm-4">Data limite</dt>
+            <dd class="col-sm-8">@Model.DueDate.ToString("dd/MM/yyyy HH:mm")</dd>
+        </dl>
+
+        <form asp-action="Edit" method="post">
+            <input asp-for="Id" type="hidden" />
+            <input asp-for="Description" type="hidden" />
+            <input asp-for="DueDate" type="hidden" />
+            <input asp-for="AssignedToName" type="hidden" />
+            <input asp-for="CreatedByName" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+
+            <div class="mb-4">
+                <label asp-for="Status" class="form-label fw-semibold"></label>
+                <select asp-for="Status" asp-items="ViewBag.AvailableStatuses" class="form-select"></select>
+                <span asp-validation-for="Status" class="text-danger small"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
