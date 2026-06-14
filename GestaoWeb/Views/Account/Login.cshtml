@@ -9,42 +9,65 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login — GestaoWeb</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3/dist/css/uikit.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body { background: #f0f2f5; }
+        .gw-login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .gw-login-card { width: 380px; }
+        .gw-login-brand { font-size: 1.6rem; font-weight: 700; color: #1e2a3a; }
+    </style>
 </head>
-<body class="bg-light">
-    <div class="d-flex justify-content-center align-items-center vh-100">
-        <div class="card shadow-sm" style="width: 380px;">
-            <div class="card-body p-4">
-                <h4 class="card-title mb-4 text-center">GestaoWeb</h4>
-
-                <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
-                    <div asp-validation-summary="All" class="alert alert-danger py-2 small" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
-
-                    <div class="mb-3">
-                        <label asp-for="Email" class="form-label">E-mail</label>
-                        <input asp-for="Email" class="form-control" autocomplete="email" />
-                        <span asp-validation-for="Email" class="text-danger small"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Password" class="form-label">Senha</label>
-                        <input asp-for="Password" class="form-control" autocomplete="current-password" />
-                        <span asp-validation-for="Password" class="text-danger small"></span>
-                    </div>
-
-                    <div class="mb-3 form-check">
-                        <input asp-for="RememberMe" class="form-check-input" />
-                        <label asp-for="RememberMe" class="form-check-label">Lembrar de mim</label>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100">Entrar</button>
-                </form>
-            </div>
+<body>
+<div class="gw-login-wrap">
+    <div class="uk-card uk-card-default uk-card-body uk-box-shadow-medium gw-login-card">
+        <div class="uk-text-center uk-margin-bottom">
+            <p class="gw-login-brand">GestaoWeb</p>
         </div>
-    </div>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="uk-alert-danger" uk-alert>
+                <button class="uk-alert-close" uk-close></button>
+                <div asp-validation-summary="All" class="uk-text-small"></div>
+            </div>
+        }
+
+        <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post" class="uk-form-stacked">
+            <div class="uk-margin">
+                <label asp-for="Email" class="uk-form-label"></label>
+                <div class="uk-form-controls">
+                    <input asp-for="Email" class="uk-input" autocomplete="email" />
+                    <span asp-validation-for="Email" class="uk-text-danger uk-text-small"></span>
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <label asp-for="Password" class="uk-form-label"></label>
+                <div class="uk-form-controls">
+                    <input asp-for="Password" class="uk-input" autocomplete="current-password" />
+                    <span asp-validation-for="Password" class="uk-text-danger uk-text-small"></span>
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <label class="uk-flex uk-flex-middle" style="gap:8px;">
+                    <input asp-for="RememberMe" class="uk-checkbox" />
+                    <span>Lembrar de mim</span>
+                </label>
+            </div>
+
+            <div class="uk-margin">
+                <button type="submit" class="uk-button uk-button-primary uk-width-1-1">Entrar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/uikit@3/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3/dist/js/uikit-icons.min.js"></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 </body>
 </html>

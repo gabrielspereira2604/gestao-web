@@ -4,73 +4,73 @@
     bool isManager = ViewBag.IsManager == true;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Tarefas</h2>
+<div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom">
+    <h2 class="uk-heading-small uk-margin-remove">Tarefas</h2>
     @if (isManager)
     {
-        <a asp-action="Create" class="btn btn-primary">Nova tarefa</a>
+        <a asp-action="Create" class="uk-button uk-button-primary">
+            <span uk-icon="icon: plus; ratio: 0.9"></span> Nova tarefa
+        </a>
     }
 </div>
 
 @if (TempData["Success"] is string msg)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @msg
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="uk-alert-success uk-margin-bottom" uk-alert>
+        <button class="uk-alert-close" uk-close></button>
+        <p>@msg</p>
     </div>
 }
 
 @if (!Model.Any())
 {
-    <p class="text-muted">Nenhuma tarefa encontrada.</p>
+    <div class="uk-alert-primary" uk-alert>
+        <p>Nenhuma tarefa encontrada.</p>
+    </div>
 }
 else
 {
-    <table class="table table-hover align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>Descrição</th>
-                @if (isManager)
-                {
-                    <th>Responsável</th>
-                }
-                else
-                {
-                    <th>Criada por</th>
-                }
-                <th>Data limite</th>
-                <th>Status</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var task in Model)
-            {
+    <div class="uk-overflow-auto">
+        <table class="uk-table uk-table-hover uk-table-middle uk-table-divider">
+            <thead>
                 <tr>
-                    <td>@task.Description</td>
-                    <td>@(isManager ? task.AssignedTo.FullName : task.CreatedBy.FullName)</td>
-                    <td>
-                        @{
-                            bool overdue = task.DueDate < DateTime.Now && task.Status != GestaoWeb.Models.Domain.WorkTaskStatus.Completed;
-                        }
-                        <span class="@(overdue ? "text-danger fw-semibold" : "")">
-                            @task.DueDate.ToString("dd/MM/yyyy HH:mm")
-                        </span>
-                    </td>
-                    <td>@Html.Partial("_TaskStatusBadge", task.Status)</td>
-                    <td class="text-end">
-                        <a asp-action="Details" asp-route-id="@task.Id" class="btn btn-sm btn-outline-secondary">Detalhes</a>
-                        @if (!isManager && task.Status != GestaoWeb.Models.Domain.WorkTaskStatus.Completed)
-                        {
-                            <a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-sm btn-outline-primary">Atualizar</a>
-                        }
-                        @if (isManager)
-                        {
-                            <a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-sm btn-outline-primary">Editar</a>
-                        }
-                    </td>
+                    <th>Descrição</th>
+                    <th>@(isManager ? "Responsável" : "Criada por")</th>
+                    <th>Data limite</th>
+                    <th class="uk-table-shrink">Status</th>
+                    <th class="uk-table-shrink"></th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var task in Model)
+                {
+                    <tr>
+                        <td>@task.Description</td>
+                        <td>@(isManager ? task.AssignedTo.FullName : task.CreatedBy.FullName)</td>
+                        <td>
+                            @{
+                                bool overdue = task.DueDate < DateTime.Now
+                                    && task.Status != GestaoWeb.Models.Domain.WorkTaskStatus.Completed;
+                            }
+                            <span class="@(overdue ? "uk-text-danger uk-text-bold" : "")">
+                                @task.DueDate.ToString("dd/MM/yyyy HH:mm")
+                            </span>
+                        </td>
+                        <td class="uk-text-nowrap">@Html.Partial("_TaskStatusBadge", task.Status)</td>
+                        <td class="uk-text-nowrap">
+                            <a asp-action="Details" asp-route-id="@task.Id"
+                               class="uk-button uk-button-default uk-button-small">Detalhes</a>
+                            @if (isManager || task.Status != GestaoWeb.Models.Domain.WorkTaskStatus.Completed)
+                            {
+                                <a asp-action="Edit" asp-route-id="@task.Id"
+                                   class="uk-button uk-button-primary uk-button-small">
+                                    @(isManager ? "Editar" : "Atualizar")
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }

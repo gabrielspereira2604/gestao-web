@@ -4,42 +4,42 @@
     bool isManager = ViewBag.IsManager == true;
 }
 
-<h2 class="mb-4">@(isManager ? "Editar tarefa" : "Atualizar status")</h2>
+<h2 class="uk-heading-small uk-margin-bottom">@(isManager ? "Editar tarefa" : "Atualizar status")</h2>
 
-<div class="card shadow-sm" style="max-width:520px;">
-    <div class="card-body">
-        <dl class="row mb-3">
-            <dt class="col-sm-4">Descrição</dt>
-            <dd class="col-sm-8">@Model.Description</dd>
+<div class="uk-card uk-card-default uk-card-body uk-box-shadow-small" style="max-width:520px;">
+    <dl class="uk-description-list uk-description-list-divider uk-margin-bottom">
+        <dt>Descrição</dt>
+        <dd>@Model.Description</dd>
+        <dt>Responsável</dt>
+        <dd>@Model.AssignedToName</dd>
+        <dt>Criada por</dt>
+        <dd>@Model.CreatedByName</dd>
+        <dt>Data limite</dt>
+        <dd>@Model.DueDate.ToString("dd/MM/yyyy HH:mm")</dd>
+    </dl>
 
-            <dt class="col-sm-4">Responsável</dt>
-            <dd class="col-sm-8">@Model.AssignedToName</dd>
+    <form asp-action="Edit" method="post" class="uk-form-stacked">
+        <input asp-for="Id" type="hidden" />
+        <input asp-for="Description" type="hidden" />
+        <input asp-for="DueDate" type="hidden" />
+        <input asp-for="AssignedToName" type="hidden" />
+        <input asp-for="CreatedByName" type="hidden" />
 
-            <dt class="col-sm-4">Criada por</dt>
-            <dd class="col-sm-8">@Model.CreatedByName</dd>
+        <div asp-validation-summary="ModelOnly" class="uk-alert-danger uk-margin-bottom" uk-alert>
+            <button class="uk-alert-close" uk-close></button>
+        </div>
 
-            <dt class="col-sm-4">Data limite</dt>
-            <dd class="col-sm-8">@Model.DueDate.ToString("dd/MM/yyyy HH:mm")</dd>
-        </dl>
-
-        <form asp-action="Edit" method="post">
-            <input asp-for="Id" type="hidden" />
-            <input asp-for="Description" type="hidden" />
-            <input asp-for="DueDate" type="hidden" />
-            <input asp-for="AssignedToName" type="hidden" />
-            <input asp-for="CreatedByName" type="hidden" />
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
-
-            <div class="mb-4">
-                <label asp-for="Status" class="form-label fw-semibold"></label>
-                <select asp-for="Status" asp-items="ViewBag.AvailableStatuses" class="form-select"></select>
-                <span asp-validation-for="Status" class="text-danger small"></span>
+        <div class="uk-margin">
+            <label asp-for="Status" class="uk-form-label uk-text-bold"></label>
+            <div class="uk-form-controls">
+                <select asp-for="Status" asp-items="ViewBag.AvailableStatuses" class="uk-select"></select>
+                <span asp-validation-for="Status" class="uk-text-danger uk-text-small"></span>
             </div>
+        </div>
 
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Salvar</button>
-                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
-            </div>
-        </form>
-    </div>
+        <div class="uk-flex uk-flex-left" style="gap:8px;">
+            <button type="submit" class="uk-button uk-button-primary">Salvar</button>
+            <a asp-action="Index" class="uk-button uk-button-default">Cancelar</a>
+        </div>
+    </form>
 </div>

@@ -3,80 +3,86 @@
     ViewData["Title"] = "Novo usuário";
 }
 
-<h2 class="mb-4">Novo usuário</h2>
+<h2 class="uk-heading-small uk-margin-bottom">Novo usuário</h2>
 
-<div class="card shadow-sm" style="max-width:600px;">
-    <div class="card-body">
-        <form asp-action="Create" method="post" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+<div class="uk-card uk-card-default uk-card-body uk-box-shadow-small" style="max-width:580px;">
+    <form asp-action="Create" method="post" enctype="multipart/form-data" class="uk-form-stacked">
+        <div asp-validation-summary="ModelOnly" class="uk-alert-danger uk-margin-bottom" uk-alert>
+            <button class="uk-alert-close" uk-close></button>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="FullName" class="form-label"></label>
-                <input asp-for="FullName" class="form-control" />
-                <span asp-validation-for="FullName" class="text-danger small"></span>
+        <div class="uk-margin">
+            <label asp-for="FullName" class="uk-form-label"></label>
+            <div class="uk-form-controls">
+                <input asp-for="FullName" class="uk-input" />
+                <span asp-validation-for="FullName" class="uk-text-danger uk-text-small"></span>
             </div>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger small"></span>
+        <div class="uk-margin">
+            <label asp-for="Email" class="uk-form-label"></label>
+            <div class="uk-form-controls">
+                <input asp-for="Email" class="uk-input" />
+                <span asp-validation-for="Email" class="uk-text-danger uk-text-small"></span>
             </div>
+        </div>
 
-            <div class="row">
-                <div class="col mb-3">
-                    <label asp-for="Password" class="form-label"></label>
-                    <input asp-for="Password" class="form-control" />
-                    <span asp-validation-for="Password" class="text-danger small"></span>
-                </div>
-                <div class="col mb-3">
-                    <label asp-for="ConfirmPassword" class="form-label"></label>
-                    <input asp-for="ConfirmPassword" class="form-control" />
-                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
-                </div>
+        <div class="uk-grid-small uk-child-width-1-2" uk-grid>
+            <div>
+                <label asp-for="Password" class="uk-form-label"></label>
+                <input asp-for="Password" class="uk-input" />
+                <span asp-validation-for="Password" class="uk-text-danger uk-text-small"></span>
             </div>
+            <div>
+                <label asp-for="ConfirmPassword" class="uk-form-label"></label>
+                <input asp-for="ConfirmPassword" class="uk-input" />
+                <span asp-validation-for="ConfirmPassword" class="uk-text-danger uk-text-small"></span>
+            </div>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="BirthDate" class="form-label"></label>
-                <input asp-for="BirthDate" class="form-control" type="date" />
-                <span asp-validation-for="BirthDate" class="text-danger small"></span>
-            </div>
+        <div class="uk-margin">
+            <label asp-for="BirthDate" class="uk-form-label"></label>
+            <input asp-for="BirthDate" class="uk-input" type="date" />
+            <span asp-validation-for="BirthDate" class="uk-text-danger uk-text-small"></span>
+        </div>
 
-            <div class="row">
-                <div class="col mb-3">
-                    <label asp-for="MobilePhone" class="form-label"></label>
-                    <input asp-for="MobilePhone" class="form-control" />
-                    <span asp-validation-for="MobilePhone" class="text-danger small"></span>
-                </div>
-                <div class="col mb-3">
-                    <label asp-for="HomePhone" class="form-label"></label>
-                    <input asp-for="HomePhone" class="form-control" />
-                </div>
+        <div class="uk-grid-small uk-child-width-1-2" uk-grid>
+            <div>
+                <label asp-for="MobilePhone" class="uk-form-label"></label>
+                <input asp-for="MobilePhone" class="uk-input" />
+                <span asp-validation-for="MobilePhone" class="uk-text-danger uk-text-small"></span>
             </div>
+            <div>
+                <label asp-for="HomePhone" class="uk-form-label"></label>
+                <input asp-for="HomePhone" class="uk-input" />
+            </div>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="Address" class="form-label"></label>
-                <input asp-for="Address" class="form-control" />
-                <span asp-validation-for="Address" class="text-danger small"></span>
-            </div>
+        <div class="uk-margin">
+            <label asp-for="Address" class="uk-form-label"></label>
+            <input asp-for="Address" class="uk-input" />
+            <span asp-validation-for="Address" class="uk-text-danger uk-text-small"></span>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="ProfilePhoto" class="form-label"></label>
-                <input asp-for="ProfilePhoto" class="form-control" type="file" accept=".jpg,.jpeg,.png,.gif" />
-                <span asp-validation-for="ProfilePhoto" class="text-danger small"></span>
-                <div class="form-text">Máximo 2 MB. Formatos: JPG, PNG, GIF.</div>
-            </div>
+        <div class="uk-margin">
+            <label asp-for="ProfilePhoto" class="uk-form-label"></label>
+            <input asp-for="ProfilePhoto" class="uk-input" type="file" accept=".jpg,.jpeg,.png,.gif" />
+            <span asp-validation-for="ProfilePhoto" class="uk-text-danger uk-text-small"></span>
+            <p class="uk-text-small uk-text-muted uk-margin-remove-top">Máximo 2 MB. JPG, PNG ou GIF.</p>
+        </div>
 
-            <div class="mb-3 form-check">
-                <input asp-for="IsManager" class="form-check-input" />
-                <label asp-for="IsManager" class="form-check-label">Perfil de gestor</label>
-            </div>
+        <div class="uk-margin">
+            <label class="uk-flex uk-flex-middle" style="gap:8px;">
+                <input asp-for="IsManager" class="uk-checkbox" />
+                <span>Perfil de gestor</span>
+            </label>
+        </div>
 
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Criar</button>
-                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
-            </div>
-        </form>
-    </div>
+        <div class="uk-flex uk-flex-left" style="gap:8px;">
+            <button type="submit" class="uk-button uk-button-primary">Criar</button>
+            <a asp-action="Index" class="uk-button uk-button-default">Cancelar</a>
+        </div>
+    </form>
 </div>
 
 @section Scripts { @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); } }

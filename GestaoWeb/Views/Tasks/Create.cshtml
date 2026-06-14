@@ -3,39 +3,45 @@
     ViewData["Title"] = "Nova tarefa";
 }
 
-<h2 class="mb-4">Nova tarefa</h2>
+<h2 class="uk-heading-small uk-margin-bottom">Nova tarefa</h2>
 
-<div class="card shadow-sm" style="max-width:520px;">
-    <div class="card-body">
-        <form asp-action="Create" method="post">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+<div class="uk-card uk-card-default uk-card-body uk-box-shadow-small" style="max-width:520px;">
+    <form asp-action="Create" method="post" class="uk-form-stacked">
+        <div asp-validation-summary="ModelOnly" class="uk-alert-danger uk-margin-bottom" uk-alert>
+            <button class="uk-alert-close" uk-close></button>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="AssignedToId" class="form-label"></label>
-                <select asp-for="AssignedToId" asp-items="ViewBag.Subordinates" class="form-select">
-                    <option value="">-- Selecione o responsável --</option>
+        <div class="uk-margin">
+            <label asp-for="AssignedToId" class="uk-form-label"></label>
+            <div class="uk-form-controls">
+                <select asp-for="AssignedToId" asp-items="ViewBag.Subordinates" class="uk-select">
+                    <option value="">— Selecione o responsável —</option>
                 </select>
-                <span asp-validation-for="AssignedToId" class="text-danger small"></span>
+                <span asp-validation-for="AssignedToId" class="uk-text-danger uk-text-small"></span>
             </div>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="Description" class="form-label"></label>
-                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                <span asp-validation-for="Description" class="text-danger small"></span>
+        <div class="uk-margin">
+            <label asp-for="Description" class="uk-form-label"></label>
+            <div class="uk-form-controls">
+                <textarea asp-for="Description" class="uk-textarea" rows="4"></textarea>
+                <span asp-validation-for="Description" class="uk-text-danger uk-text-small"></span>
             </div>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="DueDate" class="form-label"></label>
-                <input asp-for="DueDate" class="form-control" type="datetime-local" />
-                <span asp-validation-for="DueDate" class="text-danger small"></span>
+        <div class="uk-margin">
+            <label asp-for="DueDate" class="uk-form-label"></label>
+            <div class="uk-form-controls">
+                <input asp-for="DueDate" class="uk-input" type="datetime-local" />
+                <span asp-validation-for="DueDate" class="uk-text-danger uk-text-small"></span>
             </div>
+        </div>
 
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Criar tarefa</button>
-                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
-            </div>
-        </form>
-    </div>
+        <div class="uk-flex uk-flex-left" style="gap:8px;">
+            <button type="submit" class="uk-button uk-button-primary">Criar tarefa</button>
+            <a asp-action="Index" class="uk-button uk-button-default">Cancelar</a>
+        </div>
+    </form>
 </div>
 
 @section Scripts { @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); } }
