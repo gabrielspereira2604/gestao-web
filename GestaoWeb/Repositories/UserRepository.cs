@@ -27,7 +27,7 @@ public class UserRepository : IUserRepository
 
     public async Task<IdentityResult> ChangePasswordAsync(AppUser user, string newPassword)
     {
-        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-        return await _userManager.ResetPasswordAsync(user, token, newPassword);
+        await _userManager.RemovePasswordAsync(user);
+        return await _userManager.AddPasswordAsync(user, newPassword);
     }
 }
