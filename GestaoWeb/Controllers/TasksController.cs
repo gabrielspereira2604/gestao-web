@@ -1,6 +1,7 @@
 using GestaoWeb.Models.Domain;
 using GestaoWeb.Models.ViewModels.Tasks;
 using GestaoWeb.Repositories;
+using GestaoWeb.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,12 +15,14 @@ public class TasksController : Controller
     private readonly ITaskRepository _taskRepo;
     private readonly IUserRepository _userRepo;
     private readonly UserManager<AppUser> _userManager;
+    private readonly IEmailService _emailService;
 
-    public TasksController(ITaskRepository taskRepo, IUserRepository userRepo, UserManager<AppUser> userManager)
+    public TasksController(ITaskRepository taskRepo, IUserRepository userRepo, UserManager<AppUser> userManager, IEmailService emailService)
     {
         _taskRepo = taskRepo;
         _userRepo = userRepo;
         _userManager = userManager;
+        _emailService = emailService;
     }
 
     public async Task<IActionResult> Index()
@@ -74,6 +77,19 @@ public class TasksController : Controller
 
         await _taskRepo.CreateAsync(task);
 
+        var assignee = await _userRepo.GetByIdAsync(model.AssignedToId);
+        if (assignee?.Email is not null)
+        {
+            await _emailService.SendAsync(
+                assignee.Email,
+                "Nova tarefa atribuída a você",
+                $"<p>Olá, <strong>{assignee.FullName}</strong>.</p>" +
+                $"<p>Uma nova tarefa foi atribuída a você por <strong>{currentUser.FullName}</strong>:</p>" +
+                $"<blockquote>{task.Description}</blockquote>" +
+                $"<p>Prazo: <strong>{task.DueDate:dd/MM/yyyy HH:mm}</strong></p>"
+            );
+        }
+
         TempData["Success"] = "Tarefa criada com sucesso.";
         return RedirectToAction(nameof(Index));
     }
@@ -126,11 +142,25 @@ public class TasksController : Controller
             return View(model);
         }
 
+        var oldStatus = task.Status;
         task.Status = model.Status;
         if (model.Status == WorkTaskStatus.Completed && task.CompletedAt == null)
             task.CompletedAt = DateTime.UtcNow;
 
         await _taskRepo.UpdateAsync(task);
+
+        if (model.Status == WorkTaskStatus.Completed && oldStatus != WorkTaskStatus.Completed
+            && task.CreatedBy.Email is not null)
+        {
+            await _emailService.SendAsync(
+                task.CreatedBy.Email,
+                "Tarefa concluída",
+                $"<p>Olá, <strong>{task.CreatedBy.FullName}</strong>.</p>" +
+                $"<p>A tarefa abaixo foi marcada como concluída por <strong>{task.AssignedTo.FullName}</strong>:</p>" +
+                $"<blockquote>{task.Description}</blockquote>" +
+                $"<p>Concluída em: <strong>{task.CompletedAt!.Value.ToLocalTime():dd/MM/yyyy HH:mm}</strong></p>"
+            );
+        }
 
         TempData["Success"] = "Status atualizado.";
         return RedirectToAction(nameof(Index));
