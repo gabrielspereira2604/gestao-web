@@ -49,12 +49,12 @@
         <div class="uk-grid-small uk-child-width-1-2" uk-grid>
             <div>
                 <label asp-for="MobilePhone" class="uk-form-label"></label>
-                <input asp-for="MobilePhone" class="uk-input" />
+                <input asp-for="MobilePhone" class="uk-input" data-phone placeholder="(00) 00000-0000" />
                 <span asp-validation-for="MobilePhone" class="uk-text-danger uk-text-small"></span>
             </div>
             <div>
                 <label asp-for="HomePhone" class="uk-form-label"></label>
-                <input asp-for="HomePhone" class="uk-input" />
+                <input asp-for="HomePhone" class="uk-input" data-phone placeholder="(00) 0000-0000" />
             </div>
         </div>
 
@@ -85,4 +85,20 @@
     </form>
 </div>
 
-@section Scripts { @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); } }
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>
+        document.querySelectorAll('[data-phone]').forEach(function (input) {
+            input.addEventListener('input', function () {
+                var digits = this.value.replace(/\D/g, '').slice(0, 11);
+                var formatted = '';
+                if (digits.length === 0) { this.value = ''; return; }
+                if (digits.length <= 2)  formatted = '(' + digits;
+                else if (digits.length <= 6)  formatted = '(' + digits.slice(0,2) + ') ' + digits.slice(2);
+                else if (digits.length <= 10) formatted = '(' + digits.slice(0,2) + ') ' + digits.slice(2,6) + '-' + digits.slice(6);
+                else                          formatted = '(' + digits.slice(0,2) + ') ' + digits.slice(2,7) + '-' + digits.slice(7);
+                this.value = formatted;
+            });
+        });
+    </script>
+}

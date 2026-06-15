@@ -30,4 +30,7 @@ public class UserRepository : IUserRepository
         await _userManager.RemovePasswordAsync(user);
         return await _userManager.AddPasswordAsync(user, newPassword);
     }
+
+    public async Task<IdentityResult> DeleteAsync(AppUser user)
+        => await _userManager.DeleteAsync(user);
 }

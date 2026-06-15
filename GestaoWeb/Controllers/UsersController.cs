@@ -12,15 +12,17 @@ namespace GestaoWeb.Controllers;
 public class UsersController : Controller
 {
     private readonly IUserRepository _userRepo;
+    private readonly ITaskRepository _taskRepo;
     private readonly UserManager<AppUser> _userManager;
     private readonly IWebHostEnvironment _env;
 
     private static readonly string[] AllowedPhotoExtensions = [".jpg", ".jpeg", ".png", ".gif"];
     private const long MaxPhotoBytes = 2 * 1024 * 1024;
 
-    public UsersController(IUserRepository userRepo, UserManager<AppUser> userManager, IWebHostEnvironment env)
+    public UsersController(IUserRepository userRepo, ITaskRepository taskRepo, UserManager<AppUser> userManager, IWebHostEnvironment env)
     {
         _userRepo = userRepo;
+        _taskRepo = taskRepo;
         _userManager = userManager;
         _env = env;
     }
@@ -28,6 +30,8 @@ public class UsersController : Controller
     public async Task<IActionResult> Index()
     {
         if (!await IsManagerAsync()) return RedirectToAction("Index", "Home");
+        var currentUser = await _userManager.GetUserAsync(User);
+        ViewBag.CurrentUserId = currentUser?.Id;
         var users = await _userRepo.GetAllAsync();
         return View(users);
     }
@@ -63,8 +67,8 @@ public class UsersController : Controller
             EmailConfirmed = true,
             FullName = model.FullName,
             BirthDate = model.BirthDate,
-            HomePhone = model.HomePhone,
-            MobilePhone = model.MobilePhone,
+            HomePhone = StripPhone(model.HomePhone),
+            MobilePhone = StripPhone(model.MobilePhone),
             Address = model.Address,
             IsManager = model.IsManager,
             ProfilePhotoPath = photoPath
@@ -134,6 +138,7 @@ public class UsersController : Controller
             return View(model);
         }
 
+        string? oldPhotoPath = null;
         if (model.ProfilePhoto != null)
         {
             string? newPhotoPath = await SavePhotoAsync(model.ProfilePhoto, ModelState);
@@ -142,6 +147,7 @@ public class UsersController : Controller
                 ViewBag.IsManager = currentUser.IsManager;
                 return View(model);
             }
+            oldPhotoPath = user.ProfilePhotoPath;
             user.ProfilePhotoPath = newPhotoPath;
         }
 
@@ -151,8 +157,8 @@ public class UsersController : Controller
         user.NormalizedEmail = model.Email.ToUpperInvariant();
         user.NormalizedUserName = model.Email.ToUpperInvariant();
         user.BirthDate = model.BirthDate;
-        user.HomePhone = model.HomePhone;
-        user.MobilePhone = model.MobilePhone;
+        user.HomePhone = StripPhone(model.HomePhone);
+        user.MobilePhone = StripPhone(model.MobilePhone);
         user.Address = model.Address;
 
         if (currentUser.IsManager)
@@ -166,6 +172,8 @@ public class UsersController : Controller
             ViewBag.IsManager = currentUser.IsManager;
             return View(model);
         }
+
+        DeletePhotoFile(oldPhotoPath);
 
         if (!string.IsNullOrWhiteSpace(model.NewPassword))
         {
@@ -193,6 +201,56 @@ public class UsersController : Controller
         if (user == null) return NotFound();
         return View(user);
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(string id)
+    {
+        if (!await IsManagerAsync()) return RedirectToAction("Index", "Home");
+
+        var currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser?.Id == id)
+        {
+            TempData["Error"] = "Você não pode excluir sua própria conta.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var user = await _userRepo.GetByIdAsync(id);
+        if (user == null) return NotFound();
+
+        var created  = await _taskRepo.GetByManagerAsync(id);
+        var assigned = await _taskRepo.GetByAssigneeAsync(id);
+        if (created.Any() || assigned.Any())
+        {
+            TempData["Error"] = $"Não é possível excluir {user.FullName} pois há tarefas vinculadas a este usuário.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var photoPath = user.ProfilePhotoPath;
+
+        var result = await _userRepo.DeleteAsync(user);
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = "Erro ao excluir usuário: " + string.Join(", ", result.Errors.Select(e => e.Description));
+            return RedirectToAction(nameof(Index));
+        }
+
+        DeletePhotoFile(photoPath);
+
+        TempData["Success"] = $"Usuário {user.FullName} excluído com sucesso.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    private void DeletePhotoFile(string? photoPath)
+    {
+        if (string.IsNullOrEmpty(photoPath)) return;
+        var fullPath = Path.Combine(_env.WebRootPath, photoPath.TrimStart('/'));
+        if (System.IO.File.Exists(fullPath))
+            System.IO.File.Delete(fullPath);
+    }
+
+    private static string? StripPhone(string? phone)
+        => string.IsNullOrWhiteSpace(phone) ? null : new string(phone.Where(char.IsDigit).ToArray());
 
     private async Task<bool> IsManagerAsync()
     {

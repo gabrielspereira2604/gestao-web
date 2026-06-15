@@ -18,20 +18,29 @@
         <div class="uk-margin uk-text-center">
             @if (!string.IsNullOrEmpty(Model.CurrentProfilePhotoPath))
             {
-                <img src="@Model.CurrentProfilePhotoPath" class="gw-avatar uk-border-circle uk-margin-small-bottom" alt="Foto atual" />
-                <br />
+                <img id="avatar-preview" src="@Model.CurrentProfilePhotoPath" class="gw-avatar uk-border-circle uk-margin-small-bottom" alt="Foto atual"
+                     data-original="@Model.CurrentProfilePhotoPath" data-original-type="img" />
             }
             else
             {
-                <span class="gw-avatar-placeholder gw-avatar uk-border-circle uk-margin-small-bottom" style="font-size:28px;">
+                <span id="avatar-preview" class="gw-avatar-placeholder gw-avatar uk-border-circle uk-margin-small-bottom" style="font-size:28px;"
+                      data-original-type="initials" data-initial="@Model.FullName.Substring(0, 1).ToUpper()">
                     @Model.FullName.Substring(0, 1).ToUpper()
                 </span>
-                <br />
             }
-            <label asp-for="ProfilePhoto" class="uk-form-label"></label>
-            <input asp-for="ProfilePhoto" class="uk-input" type="file" accept=".jpg,.jpeg,.png,.gif" />
-            <span asp-validation-for="ProfilePhoto" class="uk-text-danger uk-text-small"></span>
-            <p class="uk-text-small uk-text-muted uk-margin-remove-top">Máximo 2 MB. Deixe em branco para manter.</p>
+            <br />
+            <input id="photo-input" asp-for="ProfilePhoto" type="file" accept=".jpg,.jpeg,.png,.gif" style="display:none;" />
+            <div class="uk-flex uk-flex-center uk-flex-middle uk-margin-small-top" style="gap:8px;">
+                <button type="button" id="photo-trigger" class="uk-button uk-button-default uk-button-small">
+                    <span uk-icon="icon: camera; ratio: 0.9"></span>
+                    <span id="photo-label" class="uk-margin-small-left">Escolher foto</span>
+                </button>
+                <button type="button" id="photo-clear" class="uk-button uk-button-danger uk-button-small" style="display:none;" title="Cancelar seleção">
+                    <span uk-icon="icon: trash; ratio: 0.9"></span>
+                </button>
+            </div>
+            <span id="photo-error" asp-validation-for="ProfilePhoto" class="uk-text-danger uk-text-small uk-display-block uk-margin-small-top"></span>
+            <p class="uk-text-small uk-text-muted uk-margin-small-top uk-margin-remove-bottom">Máximo 2 MB. Deixe em branco para manter.</p>
         </div>
 
         <div class="uk-margin">
@@ -55,12 +64,12 @@
         <div class="uk-grid-small uk-child-width-1-2" uk-grid>
             <div>
                 <label asp-for="MobilePhone" class="uk-form-label"></label>
-                <input asp-for="MobilePhone" class="uk-input" />
+                <input asp-for="MobilePhone" class="uk-input" data-phone placeholder="(00) 00000-0000" />
                 <span asp-validation-for="MobilePhone" class="uk-text-danger uk-text-small"></span>
             </div>
             <div>
                 <label asp-for="HomePhone" class="uk-form-label"></label>
-                <input asp-for="HomePhone" class="uk-input" />
+                <input asp-for="HomePhone" class="uk-input" data-phone placeholder="(00) 0000-0000" />
             </div>
         </div>
 
@@ -114,4 +123,96 @@
     </form>
 </div>
 
-@section Scripts { @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); } }
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>
+        (function () {
+            const input   = document.getElementById('photo-input');
+            const trigger = document.getElementById('photo-trigger');
+            const clear   = document.getElementById('photo-clear');
+            const label   = document.getElementById('photo-label');
+            const preview = document.getElementById('avatar-preview');
+            const type    = preview.dataset.originalType;
+
+            trigger.addEventListener('click', () => input.click());
+
+            function showPreview(src, filename) {
+                const current = document.getElementById('avatar-preview');
+                if (current.tagName === 'IMG') {
+                    current.src = src;
+                } else {
+                    const img = document.createElement('img');
+                    img.id        = 'avatar-preview';
+                    img.src       = src;
+                    img.className = current.className;
+                    img.alt       = 'Pré-visualização';
+                    Object.assign(img.dataset, { originalType: type, original: current.dataset.original, initial: current.dataset.initial });
+                    current.replaceWith(img);
+                }
+                label.textContent   = filename;
+                clear.style.display = '';
+            }
+
+            function restoreOriginal() {
+                const current = document.getElementById('avatar-preview');
+                if (type === 'img') {
+                    current.src = current.dataset.original;
+                } else {
+                    const span = document.createElement('span');
+                    span.id        = 'avatar-preview';
+                    span.className = current.className;
+                    span.style.cssText = preview.getAttribute('style') || '';
+                    Object.assign(span.dataset, { originalType: 'initials', initial: current.dataset.initial || preview.dataset.initial });
+                    span.textContent = span.dataset.initial;
+                    current.replaceWith(span);
+                }
+                input.value         = '';
+                label.textContent   = 'Escolher foto';
+                clear.style.display = 'none';
+            }
+
+            const MAX_BYTES    = 2 * 1024 * 1024;
+            const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/gif'];
+            const ALLOWED_EXT  = ['.jpg', '.jpeg', '.png', '.gif'];
+            const errorSpan    = document.getElementById('photo-error');
+
+            input.addEventListener('change', function () {
+                if (!this.files || !this.files[0]) return;
+                const file = this.files[0];
+                const ext  = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+
+                if (!ALLOWED_MIME.includes(file.type) || !ALLOWED_EXT.includes(ext)) {
+                    errorSpan.textContent = 'Formato não permitido. Use JPG, PNG ou GIF.';
+                    input.value = '';
+                    return;
+                }
+
+                if (file.size > MAX_BYTES) {
+                    errorSpan.textContent = 'A foto não pode ultrapassar 2 MB.';
+                    input.value = '';
+                    return;
+                }
+
+                errorSpan.textContent = '';
+                const reader = new FileReader();
+                reader.onload = e => showPreview(e.target.result, file.name);
+                reader.readAsDataURL(file);
+            });
+
+            clear.addEventListener('click', restoreOriginal);
+        })();
+
+        function applyPhoneMask(input) {
+            var digits = input.value.replace(/\D/g, '').slice(0, 11);
+            if (digits.length === 0) { input.value = ''; return; }
+            if (digits.length <= 2)       input.value = '(' + digits;
+            else if (digits.length <= 6)  input.value = '(' + digits.slice(0,2) + ') ' + digits.slice(2);
+            else if (digits.length <= 10) input.value = '(' + digits.slice(0,2) + ') ' + digits.slice(2,6) + '-' + digits.slice(6);
+            else                          input.value = '(' + digits.slice(0,2) + ') ' + digits.slice(2,7) + '-' + digits.slice(7);
+        }
+        document.querySelectorAll('[data-phone]').forEach(function (input) {
+            applyPhoneMask(input);
+            input.addEventListener('input', function () { applyPhoneMask(this); });
+        });
+    </script>
+}

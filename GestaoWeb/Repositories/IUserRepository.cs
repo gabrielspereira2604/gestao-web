@@ -10,4 +10,5 @@ public interface IUserRepository
     Task<IdentityResult> CreateAsync(AppUser user, string password);
     Task<IdentityResult> UpdateAsync(AppUser user);
     Task<IdentityResult> ChangePasswordAsync(AppUser user, string newPassword);
+    Task<IdentityResult> DeleteAsync(AppUser user);
 }

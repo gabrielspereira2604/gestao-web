@@ -1,6 +1,17 @@
 @model GestaoWeb.Models.Domain.AppUser
 @{
     ViewData["Title"] = "Detalhes do usuário";
+
+    string FormatPhone(string? digits)
+    {
+        if (string.IsNullOrWhiteSpace(digits)) return "—";
+        var d = new string(digits.Where(char.IsDigit).ToArray());
+        return d.Length == 11
+            ? $"({d[..2]}) {d[2..7]}-{d[7..]}"
+            : d.Length == 10
+                ? $"({d[..2]}) {d[2..6]}-{d[6..]}"
+                : digits;
+    }
 }
 
 <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom">
@@ -38,11 +49,11 @@
         <dt>E-mail</dt>
         <dd>@Model.Email</dd>
         <dt>Celular</dt>
-        <dd>@Model.MobilePhone</dd>
+        <dd>@FormatPhone(Model.MobilePhone)</dd>
         @if (!string.IsNullOrEmpty(Model.HomePhone))
         {
             <dt>Telefone fixo</dt>
-            <dd>@Model.HomePhone</dd>
+            <dd>@FormatPhone(Model.HomePhone)</dd>
         }
         <dt>Nascimento</dt>
         <dd>@Model.BirthDate.ToString("dd/MM/yyyy")</dd>
