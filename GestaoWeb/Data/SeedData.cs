@@ -20,7 +20,7 @@ public static class SeedData
             Email = email,
             EmailConfirmed = true,
             FullName = "Administrador TI",
-            MobilePhone = "(11) 99999-0000",
+            MobilePhone = "11999990000",
             Address = "Sede",
             BirthDate = new DateOnly(1990, 1, 1),
             IsManager = true

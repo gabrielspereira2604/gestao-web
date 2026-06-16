@@ -54,7 +54,7 @@ else
                                 @task.DueDate.ToString("dd/MM/yyyy")
                             </span>
                         </td>
-                        <td class="uk-text-nowrap">@Html.Partial("_TaskStatusBadge", task.Status)</td>
+                        <td class="uk-text-nowrap"><partial name="_TaskStatusBadge" model="task.Status" /></td>
                         <td class="uk-text-nowrap">
                             <a asp-action="Details" asp-route-id="@task.Id"
                                class="uk-button uk-button-default uk-button-small">Detalhes</a>

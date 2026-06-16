@@ -91,7 +91,7 @@ Para habilitar o envio de notificações por email, preencha a seção `Smtp` em
 }
 ```
 
-Quando `Host` está em branco, o envio de email é silenciosamente ignorado e a aplicação funciona normalmente.
+Quando `Host` está em branco, o envio de email é simulado: o conteúdo completo (destinatário, assunto e corpo) é registrado no console de logs com o prefixo `[EMAIL SIMULADO]`, e a aplicação continua funcionando normalmente.
 
 ## Executar os testes
 

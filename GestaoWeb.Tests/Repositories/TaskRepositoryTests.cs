@@ -21,7 +21,7 @@ public class TaskRepositoryTests
     private static TaskItem NewTask(string description, string createdById, string assignedToId) => new()
     {
         Description = description,
-        DueDate = DateTime.UtcNow.AddDays(3),
+        DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(3)),
         CreatedById = createdById,
         AssignedToId = assignedToId,
         Status = WorkTaskStatus.Pending

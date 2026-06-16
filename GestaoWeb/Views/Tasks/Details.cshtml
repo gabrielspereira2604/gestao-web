@@ -19,7 +19,7 @@
 
 <div class="uk-card uk-card-default uk-card-body uk-box-shadow-small" style="max-width:540px;">
     <div class="uk-margin-bottom">
-        @Html.Partial("_TaskStatusBadge", Model.Status)
+        <partial name="_TaskStatusBadge" model="Model.Status" />
     </div>
 
     <dl class="uk-description-list uk-description-list-divider">

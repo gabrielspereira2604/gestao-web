@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace GestaoWeb.Tests.Controllers;
@@ -36,7 +37,8 @@ public class TasksControllerTests
             taskMock?.Object ?? new Mock<ITaskRepository>().Object,
             userMock?.Object ?? new Mock<IUserRepository>().Object,
             um.Object,
-            emailMock?.Object ?? new Mock<IEmailService>().Object
+            emailMock?.Object ?? new Mock<IEmailService>().Object,
+            NullLogger<TasksController>.Instance
         );
 
         var claims = new[] { new Claim(ClaimTypes.NameIdentifier, currentUser.Id) };
@@ -109,7 +111,7 @@ public class TasksControllerTests
         var model = new CreateTaskViewModel
         {
             Description = "Tarefa",
-            DueDate = DateTime.Today.AddDays(1),
+            DueDate = DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
             AssignedToId = Guid.NewGuid().ToString()
         };
 
@@ -129,7 +131,7 @@ public class TasksControllerTests
         {
             Id = 1,
             Description = "Tarefa",
-            DueDate = DateTime.Today.AddDays(1),
+            DueDate = DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
             Status = WorkTaskStatus.Pending,
             AssignedToId = otherId,
             CreatedById = Guid.NewGuid().ToString(),
@@ -160,7 +162,7 @@ public class TasksControllerTests
         {
             Id = 1,
             Description = "Tarefa",
-            DueDate = DateTime.Today.AddDays(1),
+            DueDate = DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
             Status = WorkTaskStatus.Pending,
             AssignedToId = sub.Id,
             CreatedById = manager.Id,
@@ -191,7 +193,7 @@ public class TasksControllerTests
         {
             Id = 1,
             Description = "Tarefa",
-            DueDate = DateTime.Today.AddDays(1),
+            DueDate = DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
             Status = WorkTaskStatus.InProgress,
             AssignedToId = sub.Id,
             CreatedById = manager.Id,

@@ -68,7 +68,7 @@ public class UsersController : Controller
             FullName = model.FullName,
             BirthDate = model.BirthDate,
             HomePhone = StripPhone(model.HomePhone),
-            MobilePhone = StripPhone(model.MobilePhone),
+            MobilePhone = StripPhone(model.MobilePhone) ?? string.Empty,
             Address = model.Address,
             IsManager = model.IsManager,
             ProfilePhotoPath = photoPath
@@ -158,7 +158,7 @@ public class UsersController : Controller
         user.NormalizedUserName = model.Email.ToUpperInvariant();
         user.BirthDate = model.BirthDate;
         user.HomePhone = StripPhone(model.HomePhone);
-        user.MobilePhone = StripPhone(model.MobilePhone);
+        user.MobilePhone = StripPhone(model.MobilePhone) ?? string.Empty;
         user.Address = model.Address;
 
         if (currentUser.IsManager)
@@ -250,7 +250,11 @@ public class UsersController : Controller
     }
 
     private static string? StripPhone(string? phone)
-        => string.IsNullOrWhiteSpace(phone) ? null : new string(phone.Where(char.IsDigit).ToArray());
+    {
+        if (string.IsNullOrWhiteSpace(phone)) return null;
+        var digits = new string(phone.Where(char.IsDigit).ToArray());
+        return digits.Length == 0 ? null : digits;
+    }
 
     private async Task<bool> IsManagerAsync()
     {
