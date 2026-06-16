@@ -1,4 +1,5 @@
 using GestaoWeb.Data;
+using GestaoWeb.Infrastructure;
 using GestaoWeb.Models.Domain;
 using GestaoWeb.Repositories;
 using GestaoWeb.Services;
@@ -19,7 +20,8 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
     options.SignIn.RequireConfirmedAccount = false;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
-.AddDefaultTokenProviders();
+.AddDefaultTokenProviders()
+.AddErrorDescriber<PtBrIdentityErrorDescriber>();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
