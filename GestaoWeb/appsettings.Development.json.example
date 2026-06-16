@@ -1,0 +1,12 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost,1433;Database=GestaoWeb;User Id=sa;Password=Leve@2026!;TrustServerCertificate=True"
+  },
+  "Smtp": {
+    "Host": "",
+    "Port": 587,
+    "User": "",
+    "Password": "",
+    "From": ""
+  }
+}

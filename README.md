@@ -27,44 +27,23 @@ git clone https://github.com/gabrielspereira2604/gestao-web.git
 cd gestao-web
 ```
 
-### 2. Configurar a senha do banco de dados
-
-Copie o arquivo de exemplo:
+### 2. Copiar os arquivos de configuração
 
 ```bash
 # Linux/macOS
 cp .env.example .env
+cp GestaoWeb/appsettings.Development.json.example GestaoWeb/appsettings.Development.json
 
 # Windows (PowerShell)
 Copy-Item .env.example .env
+Copy-Item GestaoWeb/appsettings.Development.json.example GestaoWeb/appsettings.Development.json
 ```
 
-Abra `.env` e substitua `SuaSenhaAqui` por uma senha forte (deve conter letras maiúsculas, minúsculas, números e símbolos — requisito do SQL Server):
+Os arquivos já vêm com uma senha padrão (`Leve@2026!`) pronta para uso local. Nenhuma edição é necessária.
 
-```
-DB_PASSWORD=MinhaSenh@Forte123
-```
+> Se quiser usar uma senha diferente, altere `DB_PASSWORD` no `.env` **e** `Password=` na connection string do `appsettings.Development.json` para o mesmo valor antes de continuar.
 
-### 3. Criar o arquivo de configuração local
-
-Crie o arquivo `GestaoWeb/appsettings.Development.json` com o conteúdo abaixo, substituindo `MinhaSenh@Forte123` pela mesma senha definida no `.env`:
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost,1433;Database=GestaoWeb;User Id=sa;Password=MinhaSenh@Forte123;TrustServerCertificate=True"
-  },
-  "Smtp": {
-    "Host": "",
-    "Port": 587,
-    "User": "",
-    "Password": "",
-    "From": ""
-  }
-}
-```
-
-> Este arquivo é ignorado pelo Git (`.gitignore`) para não expor credenciais.
+> `appsettings.Development.json` é ignorado pelo Git (`.gitignore`) para não expor credenciais.
 
 ### 4. Subir o banco de dados
 
@@ -76,7 +55,7 @@ O SQL Server leva cerca de 20–30 segundos para inicializar. Para confirmar que
 
 ```bash
 # Aguarda até o container responder (repita se necessário)
-docker exec gestao-web-sqlserver-1 /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MinhaSenh@Forte123" -No -Q "SELECT 1" 2>/dev/null && echo "SQL Server pronto"
+docker exec gestao-web-sqlserver-1 /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "Leve@2026!" -No -Q "SELECT 1" 2>/dev/null && echo "SQL Server pronto"
 ```
 
 ### 5. Aplicar as migrations
