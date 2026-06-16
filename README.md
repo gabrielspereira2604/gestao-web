@@ -12,61 +12,96 @@ Sistema de gestão de tarefas para equipes financeiras. Desenvolvido em ASP.NET 
 
 ## Pré-requisitos
 
-| Ferramenta | Versão mínima |
-|---|---|
-| .NET SDK | 8.0 |
-| Docker Desktop | qualquer versão recente |
-| Git | qualquer versão recente |
+| Ferramenta | Versão mínima | Download |
+|---|---|---|
+| .NET SDK | 8.0 | https://dotnet.microsoft.com/download |
+| Docker Desktop | qualquer versão recente | https://www.docker.com/products/docker-desktop |
+| Git | qualquer versão recente | https://git-scm.com |
 
 ## Instalação e execução
 
 ### 1. Clonar o repositório
 
 ```bash
-git clone <url-do-repositorio>
-cd GestaoWeb
+git clone https://github.com/gabrielspereira2604/gestao-web.git
+cd gestao-web
 ```
 
-### 2. Configurar variáveis de ambiente
+### 2. Configurar a senha do banco de dados
 
-Copie o arquivo de exemplo e defina a senha do banco:
+Copie o arquivo de exemplo:
 
 ```bash
+# Linux/macOS
 cp .env.example .env
+
+# Windows (PowerShell)
+Copy-Item .env.example .env
 ```
 
-Edite `.env` e substitua `SuaSenhaAqui` por uma senha forte:
+Abra `.env` e substitua `SuaSenhaAqui` por uma senha forte (deve conter letras maiúsculas, minúsculas, números e símbolos — requisito do SQL Server):
 
 ```
 DB_PASSWORD=MinhaSenh@Forte123
 ```
 
-### 3. Subir o banco de dados
+### 3. Criar o arquivo de configuração local
+
+Crie o arquivo `GestaoWeb/appsettings.Development.json` com o conteúdo abaixo, substituindo `MinhaSenh@Forte123` pela mesma senha definida no `.env`:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost,1433;Database=GestaoWeb;User Id=sa;Password=MinhaSenh@Forte123;TrustServerCertificate=True"
+  },
+  "Smtp": {
+    "Host": "",
+    "Port": 587,
+    "User": "",
+    "Password": "",
+    "From": ""
+  }
+}
+```
+
+> Este arquivo é ignorado pelo Git (`.gitignore`) para não expor credenciais.
+
+### 4. Subir o banco de dados
 
 ```bash
 docker compose up -d
 ```
 
-Aguarde alguns segundos até o SQL Server inicializar completamente.
-
-### 4. Aplicar as migrations
+O SQL Server leva cerca de 20–30 segundos para inicializar. Para confirmar que está pronto antes de continuar:
 
 ```bash
-cd GestaoWeb
-dotnet ef database update
-cd ..
+# Aguarda até o container responder (repita se necessário)
+docker exec gestao-web-sqlserver-1 /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MinhaSenh@Forte123" -No -Q "SELECT 1" 2>/dev/null && echo "SQL Server pronto"
 ```
 
-> **Alternativa sem EF CLI**: execute os scripts `docs/sql/schema.sql` e depois `docs/sql/seed.sql` diretamente no SQL Server (SSMS, Azure Data Studio, `sqlcmd` etc.). Nesse caso, pule o passo 4 — o banco já estará pronto e o usuário inicial já terá sido criado.
+### 5. Aplicar as migrations
 
-### 5. Executar a aplicação
+Caso não tenha a ferramenta EF instalada, instale primeiro:
 
 ```bash
-cd GestaoWeb
-dotnet run
+dotnet tool install -g dotnet-ef
 ```
 
-Acesse [https://localhost:5001](https://localhost:5001) no navegador.
+Em seguida, aplique as migrations:
+
+```bash
+dotnet ef database update --project GestaoWeb
+```
+
+> **Alternativa sem EF CLI**: execute os scripts `docs/sql/schema.sql` e depois `docs/sql/seed.sql` diretamente no SQL Server (SSMS, Azure Data Studio, `sqlcmd` etc.). Nesse caso, pule o passo 5 — o banco já estará pronto com o usuário inicial criado.
+
+### 6. Executar a aplicação
+
+```bash
+dotnet run --project GestaoWeb
+```
+
+A URL de acesso será exibida no terminal (ex: `https://localhost:5001`). Abra-a no navegador.
 
 ### Credenciais do usuário gestor inicial
 
@@ -75,11 +110,13 @@ Acesse [https://localhost:5001](https://localhost:5001) no navegador.
 | Email | ti@leveinvestimentos.com.br |
 | Senha | teste123 |
 
-> O usuário gestor é criado automaticamente na primeira inicialização via `SeedData.cs`. Ao usar os scripts SQL alternativos, o mesmo usuário é inserido por `docs/sql/seed.sql`.
+> O usuário gestor é criado automaticamente na primeira inicialização. Ao usar os scripts SQL alternativos, o mesmo usuário é inserido por `docs/sql/seed.sql`.
+
+---
 
 ## Configuração de email (opcional)
 
-Para habilitar o envio de notificações por email, preencha a seção `Smtp` em `GestaoWeb/appsettings.Development.json`:
+Por padrão, o envio de email está desabilitado. Para habilitá-lo, preencha a seção `Smtp` no `GestaoWeb/appsettings.Development.json`:
 
 ```json
 "Smtp": {
@@ -91,15 +128,19 @@ Para habilitar o envio de notificações por email, preencha a seção `Smtp` em
 }
 ```
 
-Quando `Host` está em branco, o envio de email é simulado: o conteúdo completo (destinatário, assunto e corpo) é registrado no console de logs com o prefixo `[EMAIL SIMULADO]`, e a aplicação continua funcionando normalmente.
+Quando `Host` está em branco, os emails são simulados: o conteúdo completo (destinatário, assunto e corpo) é exibido no console com o prefixo `[EMAIL SIMULADO]`.
+
+---
 
 ## Executar os testes
 
 ```bash
-dotnet test GestaoWeb.Tests/GestaoWeb.Tests.csproj
+dotnet test GestaoWeb.Tests
 ```
 
 25 testes unitários cobrindo repositories, controllers e email service.
+
+---
 
 ## Estrutura do projeto
 
