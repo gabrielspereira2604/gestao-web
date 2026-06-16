@@ -34,7 +34,6 @@ else
         <table class="uk-table uk-table-hover uk-table-middle uk-table-divider">
             <thead>
                 <tr>
-                    <th>Descrição</th>
                     <th>@(isManager ? "Responsável" : "Criada por")</th>
                     <th>Data limite</th>
                     <th class="uk-table-shrink">Status</th>
@@ -45,15 +44,14 @@ else
                 @foreach (var task in Model)
                 {
                     <tr>
-                        <td>@task.Description</td>
                         <td>@(isManager ? task.AssignedTo.FullName : task.CreatedBy.FullName)</td>
                         <td>
                             @{
-                                bool overdue = task.DueDate < DateTime.Now
+                                bool overdue = task.DueDate < DateOnly.FromDateTime(DateTime.Today)
                                     && task.Status != GestaoWeb.Models.Domain.WorkTaskStatus.Completed;
                             }
                             <span class="@(overdue ? "uk-text-danger uk-text-bold" : "")">
-                                @task.DueDate.ToString("dd/MM/yyyy HH:mm")
+                                @task.DueDate.ToString("dd/MM/yyyy")
                             </span>
                         </td>
                         <td class="uk-text-nowrap">@Html.Partial("_TaskStatusBadge", task.Status)</td>

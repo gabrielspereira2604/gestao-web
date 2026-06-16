@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using GestaoWeb.Models.Validation;
 
 namespace GestaoWeb.Models.ViewModels.Tasks;
 
@@ -10,7 +11,8 @@ public class CreateTaskViewModel
 
     [Required(ErrorMessage = "Informe a data limite")]
     [Display(Name = "Data limite")]
-    public DateTime DueDate { get; set; } = DateTime.Today.AddDays(1);
+    [MinToday]
+    public DateOnly DueDate { get; set; } = DateOnly.FromDateTime(DateTime.Today.AddDays(7));
 
     [Required(ErrorMessage = "Selecione o responsável")]
     [Display(Name = "Responsável")]

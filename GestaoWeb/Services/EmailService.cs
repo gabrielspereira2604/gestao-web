@@ -20,7 +20,14 @@ public class EmailService : IEmailService
     {
         if (string.IsNullOrWhiteSpace(_settings.Host))
         {
-            _logger.LogInformation("SMTP não configurado. E-mail para {To} ignorado.", to);
+            _logger.LogWarning(
+                """
+                [EMAIL SIMULADO]
+                Para:     {To}
+                Assunto:  {Subject}
+                Corpo:    {Body}
+                """,
+                to, subject, body);
             return;
         }
 

@@ -16,13 +16,15 @@ public class TasksController : Controller
     private readonly IUserRepository _userRepo;
     private readonly UserManager<AppUser> _userManager;
     private readonly IEmailService _emailService;
+    private readonly ILogger<TasksController> _logger;
 
-    public TasksController(ITaskRepository taskRepo, IUserRepository userRepo, UserManager<AppUser> userManager, IEmailService emailService)
+    public TasksController(ITaskRepository taskRepo, IUserRepository userRepo, UserManager<AppUser> userManager, IEmailService emailService, ILogger<TasksController> logger)
     {
         _taskRepo = taskRepo;
         _userRepo = userRepo;
         _userManager = userManager;
         _emailService = emailService;
+        _logger = logger;
     }
 
     public async Task<IActionResult> Index()
@@ -80,14 +82,21 @@ public class TasksController : Controller
         var assignee = await _userRepo.GetByIdAsync(model.AssignedToId);
         if (assignee?.Email is not null)
         {
-            await _emailService.SendAsync(
-                assignee.Email,
-                "Nova tarefa atribuída a você",
-                $"<p>Olá, <strong>{assignee.FullName}</strong>.</p>" +
-                $"<p>Uma nova tarefa foi atribuída a você por <strong>{currentUser.FullName}</strong>:</p>" +
-                $"<blockquote>{task.Description}</blockquote>" +
-                $"<p>Prazo: <strong>{task.DueDate:dd/MM/yyyy HH:mm}</strong></p>"
-            );
+            try
+            {
+                await _emailService.SendAsync(
+                    assignee.Email,
+                    "Nova tarefa atribuída a você",
+                    $"<p>Olá, <strong>{assignee.FullName}</strong>.</p>" +
+                    $"<p>Uma nova tarefa foi atribuída a você por <strong>{currentUser.FullName}</strong>:</p>" +
+                    $"<blockquote>{task.Description}</blockquote>" +
+                    $"<p>Prazo: <strong>{task.DueDate:dd/MM/yyyy}</strong></p>"
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Falha ao enviar e-mail de nova tarefa para {Email}.", assignee.Email);
+            }
         }
 
         TempData["Success"] = "Tarefa criada com sucesso.";
@@ -152,14 +161,21 @@ public class TasksController : Controller
         if (model.Status == WorkTaskStatus.Completed && oldStatus != WorkTaskStatus.Completed
             && task.CreatedBy.Email is not null)
         {
-            await _emailService.SendAsync(
-                task.CreatedBy.Email,
-                "Tarefa concluída",
-                $"<p>Olá, <strong>{task.CreatedBy.FullName}</strong>.</p>" +
-                $"<p>A tarefa abaixo foi marcada como concluída por <strong>{task.AssignedTo.FullName}</strong>:</p>" +
-                $"<blockquote>{task.Description}</blockquote>" +
-                $"<p>Concluída em: <strong>{task.CompletedAt!.Value.ToLocalTime():dd/MM/yyyy HH:mm}</strong></p>"
-            );
+            try
+            {
+                await _emailService.SendAsync(
+                    task.CreatedBy.Email,
+                    "Tarefa concluída",
+                    $"<p>Olá, <strong>{task.CreatedBy.FullName}</strong>.</p>" +
+                    $"<p>A tarefa abaixo foi marcada como concluída por <strong>{task.AssignedTo.FullName}</strong>:</p>" +
+                    $"<blockquote>{task.Description}</blockquote>" +
+                    $"<p>Concluída em: <strong>{task.CompletedAt!.Value.ToLocalTime():dd/MM/yyyy HH:mm}</strong></p>"
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Falha ao enviar e-mail de conclusão para {Email}.", task.CreatedBy.Email);
+            }
         }
 
         TempData["Success"] = "Status atualizado.";

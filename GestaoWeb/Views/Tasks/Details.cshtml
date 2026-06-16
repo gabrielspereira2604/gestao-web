@@ -32,11 +32,11 @@
         <dt>Data limite</dt>
         <dd>
             @{
-                bool overdue = Model.DueDate < DateTime.Now
+                bool overdue = Model.DueDate < DateOnly.FromDateTime(DateTime.Today)
                     && Model.Status != GestaoWeb.Models.Domain.WorkTaskStatus.Completed;
             }
             <span class="@(overdue ? "uk-text-danger uk-text-bold" : "")">
-                @Model.DueDate.ToString("dd/MM/yyyy HH:mm")
+                @Model.DueDate.ToString("dd/MM/yyyy")
             </span>
         </dd>
         <dt>Criada em</dt>

@@ -18,7 +18,7 @@ public class TaskRepository : ITaskRepository
             .Include(t => t.AssignedTo)
             .Include(t => t.CreatedBy)
             .Where(t => t.CreatedById == managerId)
-            .OrderByDescending(t => t.CreatedAt)
+            .OrderBy(t => t.DueDate)
             .ToListAsync();
 
     public async Task<IEnumerable<TaskItem>> GetByAssigneeAsync(string userId)
@@ -26,7 +26,7 @@ public class TaskRepository : ITaskRepository
             .Include(t => t.AssignedTo)
             .Include(t => t.CreatedBy)
             .Where(t => t.AssignedToId == userId)
-            .OrderByDescending(t => t.CreatedAt)
+            .OrderBy(t => t.DueDate)
             .ToListAsync();
 
     public async Task<TaskItem?> GetByIdAsync(int id)

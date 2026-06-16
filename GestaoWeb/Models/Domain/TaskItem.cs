@@ -11,7 +11,7 @@ public class TaskItem
 {
     public int Id { get; set; }
     public string Description { get; set; } = string.Empty;
-    public DateTime DueDate { get; set; }
+    public DateOnly DueDate { get; set; }
     public WorkTaskStatus Status { get; set; } = WorkTaskStatus.Pending;
 
     public string AssignedToId { get; set; } = string.Empty;
